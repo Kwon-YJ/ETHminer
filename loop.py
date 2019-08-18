@@ -1,5 +1,6 @@
 import pybithumb, time
 #----------------------------------
+#15이평선이 60이평선 보다 높을 때
 def marketReader(currency, interval):
     df = pybithumb.get_ohlcv(currency, interval)
     ma15 = df['close'].rolling(window=15).mean()
@@ -25,7 +26,8 @@ def belowline(currency, interval):
     priceNow = pybithumb.get_current_price(currency)
     df = pybithumb.get_ohlcv(currency, interval)
     ma60 = df['close'].rolling(window=60).mean()
-    if priceNow <= ma60:
+    atr = getATR(currency, interval)
+    if priceNow <= ma60 - atr:
         return 1
     else:
         return 0
@@ -71,3 +73,4 @@ while True:
         positioned = False
     print('tiktok...' , end='')
     time.sleep(1)
+    #test
