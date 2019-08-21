@@ -1,14 +1,29 @@
 import pybithumb, time
 #----------------------------------
-#15이평선이 60이평선 보다 높을 때
+def getATR(currency, interval):
+    df = pybithumb.get_ohlcv(currency, interval)
+    close = df['close'][-15:-1]
+    high = df['high'][-15:-1]
+    low = df['low'][-15:-1]
+    
+    TRs = []
+    TRs.append(high[0]-low[0])
+    for i in range(1,14):
+        TRs.append(max(abs(high[i]-low[i]), abs(high[i]-close[i-1]), abs(low[i]-close[i-1])))
+    return sum(TRs) / len(TRs)
+
+#15이평선이 60이평선 보다 atr 만큼 높을 때
 def marketReader(currency, interval):
     df = pybithumb.get_ohlcv(currency, interval)
-    ma15 = df['close'].rolling(window=15).mean()
-    ma60 = df['close'].rolling(window=60).mean()
-    last_ma15 = ma15[-2]
-    last_ma60 = ma60[-2]
-    print(last_ma15, last_ma60)
-    if last_ma15 > last_ma60:
+    print('hi')
+    print(df)
+    ma2 = df['close'].rolling(window=2).mean()
+    ma20 = df['close'].rolling(window=20).mean()
+    last_ma2 = ma2[-2]
+    last_ma20 = ma20[-2]
+    atr = getATR()
+    print(last_ma2, last_ma20)
+    if last_ma2 > last_ma20 + atr:
         return 1
     else:
         return 0
@@ -16,8 +31,8 @@ def marketReader(currency, interval):
 def aboveline(currency, interval):
     priceNow = pybithumb.get_current_price(currency)
     df = pybithumb.get_ohlcv(currency, interval)
-    ma15 = df['close'].rolling(window=15).mean()
-    if priceNow > ma15:
+    ma20 = df['close'].rolling(window=20).mean()
+    if priceNow > ma20:
         return 1
     else:
         return 0
@@ -32,17 +47,7 @@ def belowline(currency, interval):
     else:
         return 0
 
-def getATR(currency, interval):
-    df = pybithumb.get_ohlcv(currency, interval)
-    close = df['close'][-15:-1]
-    high = df['high'][-15:-1]
-    low = df['low'][-15:-1]
-    
-    TRs = []
-    TRs.append(high[0]-low[0])
-    for i in range(1,14):
-        TRs.append(max(abs(high[i]-low[i]), abs(high[i]-close[i-1]), abs(low[i]-close[i-1])))
-    return sum(TRs) / len(TRs)
+
 
 def buy(currency, units):
     print("buy")
@@ -68,7 +73,7 @@ while True:
         positioned = True
         
 
-    elif positioned == True and (belowline==1):
+    elif positioned == True and (aboveline == 0):
         sell(currency, 50)
         positioned = False
     print('tiktok...' , end='')
