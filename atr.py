@@ -1,4 +1,4 @@
-import pybithumb
+import pybithumb, ohlcv
 
 currency = "BTC"
 interval = "minute"
@@ -6,7 +6,7 @@ interval = "minute"
 
 
 def getATR(currency, interval):
-    df = pybithumb.get_ohlcv(currency, interval)
+    df = ohlcv.get_ohlcv(currency, interval)
     close = df['close'][-15:-1]
     high = df['high'][-15:-1]
     low = df['low'][-15:-1]
